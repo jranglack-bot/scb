@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deine Erfolgs-DNA · Secret Creators Club</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* SCB Brand Palette – helle Beige-Variante */
+    --bg:        #EFE6D6;          /* angenehmes warmes Beige */
+    --bg-deep:   #E7DCC6;
+    --card:      #FBF7EF;          /* helle Creme-Karten */
+    --card-2:    #F6EFE1;          /* Eingabefelder */
+    --gold:      #8A6C26;          /* tiefes, lesbares Gold für Akzente/Text auf Beige */
+    --gold-bright:#B5891F;         /* leuchtenderes Gold für Highlights/Verläufe */
+    --gold-soft: rgba(151,118,44,0.12);
+    --gold-line: rgba(151,118,44,0.30);
+    --text:      #2C2418;          /* dunkles Espresso-Braun, sehr gut lesbar */
+    --text-muted:#6A5F4D;          /* gedämpftes Braun für Fließtext */
+    --text-hint: #8A7D64;          /* helleres Braun für Hinweise */
+    --border:    rgba(120,96,48,0.22);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* edle Hintergrund-Glows */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(60% 40% at 50% -5%, rgba(197,168,128,0.12), transparent 60%),
+      radial-gradient(50% 35% at 100% 35%, rgba(212,175,55,0.06), transparent 60%),
+      radial-gradient(55% 40% at 0% 80%, rgba(197,168,128,0.05), transparent 60%);
+  }
+
+  .page-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ============ LOGO (animiert, oben mittig) ============ */
+  .logo-stage {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 0 0.5rem;
+    perspective: 900px;
+  }
+  .logo-3d {
+    width: 132px;
+    height: 132px;
+    transform-style: preserve-3d;
+    animation: logoSpin 9s cubic-bezier(.45,0,.55,1) infinite;
+    position: relative;
+  }
+  .logo-3d img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Logo liegt als transparentes PNG vor, kein Blending nötig, Gold bleibt farbecht */
+    filter: drop-shadow(0 6px 14px rgba(90,70,30,0.28));
+    backface-visibility: visible;
+  }
+  /* dezenter warmer Halo hinter dem Logo (statisch) */
+  .logo-3d::after {
+    content: '';
+    position: absolute;
+    inset: -22%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(151,118,44,0.14), transparent 68%);
+    z-index: -1;
+  }
+  /* kontinuierliche 3D-Drehung (ohne Auf-/Ab-Schweben) */
+  @keyframes logoSpin {
+    0%   { transform: rotateY(0deg); }
+    50%  { transform: rotateY(180deg); }
+    100% { transform: rotateY(360deg); }
+  }
+  .logo-tagline {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: .42em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: .35rem;
+    opacity: .85;
+  }
+
+  /* ============ COVER / HERO ============ */
+  .cover {
+    padding: 2.5rem 0 2.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-line);
+    padding: 6px 15px;
+    border-radius: 20px;
+    margin-bottom: 1.6rem;
+  }
+
+  .cover h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(38px, 8vw, 62px);
+    font-weight: 500;
+    letter-spacing: .005em;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+  .cover h1 strong {
+    font-weight: 600;
+    background: linear-gradient(100deg, var(--gold), var(--gold-bright) 55%, var(--gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cover-sub {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 460px;
+    line-height: 1.7;
+  }
+
+  .cover-meta {
+    margin-top: 1.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.4rem;
+    font-size: 12px;
+    color: var(--text-hint);
+  }
+  .cover-meta span { display: flex; align-items: center; gap: 6px; }
+  .cover-meta svg { stroke: var(--gold); }
+
+  /* ============ PROGRESS ============ */
+  .progress-wrap { margin-bottom: 3rem; }
+  .progress-info {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-hint); margin-bottom: 8px;
+    letter-spacing: .02em;
+  }
+  .progress-info span:last-child { color: var(--gold); }
+  .progress-bar {
+    height: 4px; background: rgba(120,96,48,0.16);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+    border-radius: 3px; transition: width .5s ease; width: 0%;
+    box-shadow: 0 0 12px rgba(212,175,55,0.6);
+  }
+
+  /* ============ SECTIONS ============ */
+  .section { margin-bottom: 3.25rem; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;
+  }
+  .section-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-line);
+    color: var(--gold);
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: background .3s, color .3s, border-color .3s;
+  }
+  .section-num.done {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #FFFFFF;
+  }
+  .section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--gold);
+  }
+  .section-rule { flex: 1; height: 1px; background: var(--border); }
+
+  /* QUOTE */
+  .quote {
+    border-left: 2px solid var(--gold);
+    padding: .95rem 1.2rem;
+    background: var(--gold-soft);
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1.25rem;
+    font-size: 14px;
+    color: #5c4a2a;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* MEDITATION */
+  .meditation {
+    background: var(--card-2);
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 1.25rem;
+    border-left: 2px solid var(--gold);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .meditation::before { content: '✦  '; color: var(--gold); }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.35rem 1.6rem;
+    margin-bottom: 1rem;
+    transition: border-color .25s, box-shadow .25s;
+  }
+  .card:focus-within {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold-soft), 0 8px 26px rgba(120,96,48,0.16);
+  }
+  .card-q { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: .35rem; line-height: 1.45; }
+  .card-hint { font-size: 12px; color: var(--text-hint); margin-bottom: .95rem; line-height: 1.55; }
+
+  textarea {
+    width: 100%;
+    border: 1px solid rgba(120,96,48,0.28);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: var(--card-2);
+    resize: vertical;
+    min-height: 92px;
+    line-height: 1.65;
+    transition: border-color .15s, box-shadow .15s;
+    outline: none;
+  }
+  textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-soft); }
+  textarea::placeholder { color: #b3a88f; }
+
+  /* ============ STATEMENT ============ */
+  .statement {
+    border-top: 1px solid var(--border);
+    padding-top: 3rem;
+    margin-bottom: 3rem;
+  }
+  .statement-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--gold-line);
+    box-shadow: 0 16px 40px rgba(90,70,35,0.22);
+    min-height: 360px;
+    display: flex;
+  }
+  .statement-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center 35%;
+  }
+  .statement-overlay {
+    position: relative; z-index: 2; width: 100%;
+    padding: 2.5rem 2rem 2.25rem;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    background: linear-gradient(180deg, rgba(18,12,5,0.42), rgba(18,12,5,0.80) 62%, rgba(18,12,5,0.92));
+  }
+  .statement-overlay h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 600; margin-bottom: .8rem;
+    color: #FFFFFF; text-shadow: 0 2px 14px rgba(0,0,0,0.55);
+  }
+  .statement-overlay p {
+    font-size: 14.5px; color: rgba(255,255,255,0.94); line-height: 1.75;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+  }
+  .statement-overlay .sig {
+    margin-top: 1rem; color: #ECCB7E; font-style: italic; font-size: 16px;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+  }
+
+  /* ============ DOWNLOAD ============ */
+  .download-section {
+    margin-top: 3.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .final-msg {
+    background: linear-gradient(160deg, #FFFCF6, #F1E6D0);
+    border: 1px solid var(--gold-line);
+    border-radius: 16px;
+    padding: 2rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .final-msg h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: .6rem;
+  }
+  .final-msg p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+  .btn-download {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%;
+    padding: 1.1rem 1.5rem;
+    background: linear-gradient(100deg, var(--gold), var(--gold-bright));
+    color: #FFFFFF;
+    border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif;
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 10px 30px rgba(197,168,128,0.25);
+    transition: transform .15s, box-shadow .25s;
+  }
+  .btn-download:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(212,175,55,0.4); }
+  .btn-download:active { transform: scale(.98); }
+  .btn-download svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .download-note { text-align: center; font-size: 9.5px; color: var(--text-hint); margin-top: .9rem; opacity: .8; letter-spacing: .01em; }
+
+  /* Hinweis: bitte erst alle Felder ausfüllen */
+  .pdf-reminder {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    padding: .9rem 1.25rem;
+    border: 1px solid var(--gold-line);
+    background: var(--gold-soft);
+    border-radius: 12px;
+    color: var(--gold);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .pdf-reminder svg {
+    width: 20px; height: 20px; flex-shrink: 0;
+    stroke: var(--gold); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  textarea.field-missing {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 0 2px rgba(212,175,55,0.25);
+  }
+
+  /* ============ FOOTER ============ */
+  .brand-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .brand-footer img { width: 64px; height: 64px; object-fit: contain; opacity: .9; margin-bottom: .75rem; }
+  .brand-footer p { font-size: 12px; color: var(--text-hint); }
+  .brand-footer .gold { color: var(--gold); }
+  .brand-footer .legal-links {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .brand-footer .legal-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: .04em;
+    border-bottom: 1px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  .brand-footer .legal-links a:hover {
+    color: var(--gold);
+    border-color: var(--gold-line);
+  }
+
+  /* ============ SCROLL REVEAL ============ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(46px);
+    transition: opacity .75s cubic-bezier(.2,.7,.2,1), transform .75s cubic-bezier(.2,.7,.2,1);
+    will-change: opacity, transform;
+  }
+  .reveal.from-left  { transform: translateX(-56px); }
+  .reveal.from-right { transform: translateX(56px); }
+  .reveal.scale-in   { transform: scale(.9); }
+  .reveal.is-visible { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+    .logo-3d { animation: none; }
+  }
+
+  @media (max-width: 480px) {
+    .page-wrap { padding: 0 1.1rem 3rem; }
+    .cover { padding: 1.75rem 0; }
+    .card { padding: 1.1rem 1.2rem; }
+    .final-msg { padding: 1.6rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- LOGO -->
+  <div class="logo-stage">
+    <div class="logo-3d">
+      <img src="assets/logo.png" alt="Secret Creators Club">
+    </div>
+  </div>
+  <div class="logo-tagline">Secret Creators Club</div>
+
+  <!-- COVER / HERO -->
+  <div class="cover">
+    <div class="cover-badge reveal">Exklusives Pre-Workshop Workbook</div>
+    <h1 class="reveal">Deine<br><strong>Erfolgs-DNA</strong></h1>
+    <p class="cover-sub reveal">3 Übungen die zeigen, was dich von allen anderen unterscheidet. Nimm dir 15 Minuten. Sei ehrlich mit dir, bevor wir uns im Live-Workshop sehen.</p>
+
+    <div class="cover-meta reveal">
+      <span>
+        <svg width="14" height="14" fill="none" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        15 Minuten
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        11 Fragen
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Antworten als PDF
+      </span>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap reveal">
+    <div class="progress-info">
+      <span>Dein Fortschritt</span>
+      <span id="pct-label">0 von 11 beantwortet</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="prog"></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-header reveal from-left">
+      <div class="section-num">1</div>
+      <div class="section-title">Dein Zukunftsbild</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="quote reveal">Die erfolgreichsten Menschen haben eines gemeinsam: ein unglaublich klares Bild davon, wo sie hinwollen. Nicht „finanziell frei", sondern konkret, mit Gefühl, mit Details.</div>
+
+    <div class="meditation reveal">Schließ kurz die Augen. Du wachst in deinem normalen Alltag in der Zukunft auf, nicht im Urlaub. Beantworte dann diese Fragen so konkret wie möglich:</div>
+
+    <div class="card reveal">
+      <div class="card-q">Wie sieht der Raum aus, in dem du aufwachst?</div>
+      <div class="card-hint">Materialien, Licht, Atmosphäre. Hohe Decken oder gemütlich?</div>
+      <textarea id="q1" placeholder="z. B. Helles Loft mit Holzboden, großen Fenstern, Blick aufs Wasser. Morgens ist es still." oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Wie beginnt dein Tag wirklich?</div>
+      <div class="card-hint">Arbeitest du zuerst? Bewegst du dich? Kaffee allein oder mit jemandem?</div>
+      <textarea id="q2" placeholder="z. B. Ich stehe ohne Wecker auf, mache Sport, trinke Kaffee allein, dann 3 Stunden fokussierte Arbeit…" oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Wer ist regelmäßig Teil deines Lebens?</div>
+      <div class="card-hint">Welche Gespräche führst du? Über Probleme oder Möglichkeiten?</div>
+      <textarea id="q3" placeholder="z. B. 3 bis 4 enge Menschen die auch bauen. Wir reden über Projekte, Reisen, neue Ideen. Kein Drama." oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Wie wirst du wahrgenommen, wenn du einen Raum betrittst?</div>
+      <div class="card-hint">Wie gehst du auf Menschen zu? Was strahlst du aus?</div>
+      <textarea id="q4" placeholder="z. B. Ruhig, präsent, nicht aufdringlich. Leute kommen auf mich zu. Ich muss mich nicht verkaufen." oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Wie reden sie über dich, wenn du den Raum verlässt?</div>
+      <div class="card-hint">Was sagen sie? Für was stehst du?</div>
+      <textarea id="q5" placeholder='z. B. "Die hilft wirklich. Die hat was erreicht und ist trotzdem echt geblieben."' oninput="update()"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-header reveal from-left">
+      <div class="section-num">2</div>
+      <div class="section-title">Dein Warum</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="quote reveal">Disziplin entsteht nicht durch Willenskraft, sie entsteht durch Klarheit. Wenn dein Warum stark genug ist, suchst du keine Ausreden mehr.</div>
+
+    <div class="card reveal">
+      <div class="card-q">Wofür stehst du morgens auf, wenn niemand zuschaut?</div>
+      <div class="card-hint">Nicht was du erreichen willst. Was zieht dich an, selbst wenn es schwer wird?</div>
+      <textarea id="q6" placeholder="z. B. Ich will das Gefühl kennen, etwas aus eigener Kraft aufgebaut zu haben. Unabhängig. Auf meine Weise." oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Was wirst du mit deinem Erfolg wirklich machen?</div>
+      <div class="card-hint">Welchen Unterschied willst du machen, wenn Geld keine Rolle mehr spielt?</div>
+      <textarea id="q7" placeholder="z. B. Ich helfe Frauen in meinem Umfeld raus aus Abhängigkeit. Ich unterstütze meine Familie. Ich reise und lebe bewusst." oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Wie viel verdienst du im Endziel genau pro Monat, und was machst du damit?</div>
+      <div class="card-hint">Keine runde Zahl. Denk konkret: Was kostet dein Traumleben wirklich?</div>
+      <textarea id="q8" placeholder="z. B. 8.500 € netto. Davon Miete, Reisen, 1.000 € für ein Projekt das mir wichtig ist, Rest Freiheit." oninput="update()"></textarea>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-header reveal from-left">
+      <div class="section-num">3</div>
+      <div class="section-title">Dein Umfeld-Check</div>
+      <div class="section-rule"></div>
+    </div>
+
+    <div class="quote reveal">Du bist der Durchschnitt der 5 Menschen, mit denen du die meiste Zeit verbringst. Das klingt hart, aber es ist reine Logik.</div>
+
+    <div class="card reveal">
+      <div class="card-q">Welche Stimmen in deinem Umfeld bremsen dich, bewusst oder unbewusst?</div>
+      <div class="card-hint">Kein Name nötig, beschreib die Dynamik.</div>
+      <textarea id="q9" placeholder='z. B. Eine Person sagt immer "das ist nichts für dich". Jemand macht Witze drüber. Ich vergleiche mich ständig.' oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Welche Menschen tun dir wirklich gut und glauben an dich?</div>
+      <div class="card-hint">Wo wirst du mehr Zeit investieren?</div>
+      <textarea id="q10" placeholder="z. B. Meine Schwester, eine Freundin die auch etwas aufbaut, ein Mentor den ich online verfolge…" oninput="update()"></textarea>
+    </div>
+
+    <div class="card reveal">
+      <div class="card-q">Was wirst du ab heute aufhören zu tun?</div>
+      <div class="card-hint">1 Gewohnheit, 1 Gedanke oder 1 Dynamik, die dich zurückhält.</div>
+      <textarea id="q11" placeholder="z. B. Ich höre auf, mich mit anderen zu vergleichen bevor ich selbst angefangen habe." oninput="update()"></textarea>
+    </div>
+  </div>
+
+  <!-- STATEMENT -->
+  <div class="statement reveal scale-in">
+    <div class="statement-card">
+      <img class="statement-bg" src="assets/jacky-julez.jpg" alt="Jacky &amp; Julez">
+      <div class="statement-overlay">
+        <h3>Eine persönliche Nachricht an dich</h3>
+        <p>Wir wissen genau, wie sich dieser Punkt anfühlt, zwischen „ich will mehr" und „ich weiß nicht, wo ich anfangen soll". Genau da haben wir auch gestanden. Was du hier gerade ausfüllst, ist kein Test. Es ist dein ehrlicher Startpunkt. Bring ihn mit in den Live-Workshop, dann zeigen wir dir, welches digitale System wirklich zu deinem Leben passt.</p>
+        <p class="sig">Lots of Love, Jacky &amp; Julez</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD -->
+  <div class="download-section">
+    <div class="final-msg reveal scale-in">
+      <h3>Du hast dir gerade den ehrlichsten Spiegel vorgehalten.</h3>
+      <p>Und das ist erst der Anfang. Im Live-Workshop machen wir aus genau diesen Antworten deinen ganz konkreten Fahrplan.<br>Freu dich drauf, das wird dein Wendepunkt.</p>
+    </div>
+
+    <div class="pdf-reminder" id="pdf-reminder">
+      <svg viewBox="0 0 24 24"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+      <span id="pdf-reminder-text"></span>
+    </div>
+
+    <button class="btn-download reveal" onclick="exportPDF()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Meine Antworten als PDF speichern
+    </button>
+    <p class="download-note">Deine Antworten werden anonym und ohne Namen ausgewertet.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="brand-footer">
+    <img src="assets/logo.png" alt="Secret Creators Club">
+    <p><span class="gold">@secretcreatorsclub</span> · Lots of Love, Jacky &amp; Julez</p>
+    <p class="legal-links">
+      <a href="https://www.secretcreators.de/impressum/" target="_blank" rel="noopener">Impressum</a>
+      <a href="https://www.secretcreators.de/datenschutz/" target="_blank" rel="noopener">Datenschutz</a>
+      <a href="https://www.secretcreators.de/agb/" target="_blank" rel="noopener">AGB</a>
+    </p>
+  </div>
+
+</div>
+
+<script>
+  const total = 11;
+
+  // Make-Webhook: Antworten anonym (ohne Namen) + Zeitstempel übermitteln
+  const WEBHOOK_URL = 'https://hook.eu2.make.com/82xeyesm01oanzv8nr26nudhfbz75tpt';
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Baut den kompletten Text (wie im PDF) als HTML fürs Google-Doc
+  function buildDocHtml() {
+    const d = new Date();
+    let html = '<h2>Deine Erfolgs-DNA</h2>'
+      + '<p>Secret Creators Club &middot; @secretcreatorsclub<br>Eingegangen: ' + escapeHtml(d.toLocaleString('de-DE')) + '</p>';
+    PDF_SECTIONS.forEach(function (sec, si) {
+      html += '<h3>' + (si + 1) + ' &middot; ' + escapeHtml(sec.title) + '</h3>';
+      sec.items.forEach(function (it) {
+        const a = (document.getElementById(it[1]).value || '').trim();
+        html += '<p><b>' + escapeHtml(it[0]) + '</b><br>' + escapeHtml(a).replace(/\n/g, '<br>') + '</p>';
+      });
+    });
+    html += '<p><b>Das ist dein Mega-Fahrplan.</b><br>Wir freuen uns riesig, ihn mit dir im Live-Workshop weiterzudenken.</p>';
+    return html;
+  }
+
+  function sendAnswers() {
+    if (sessionStorage.getItem('scb_answers_sent') === 'true') return;
+    try {
+      const d = new Date();
+      const pad = function (n) { return String(n).padStart(2, '0'); };
+      // Dokumentname = Zeitstempel (sortierbar & dateiname-sicher)
+      const titel = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+        + ' ' + pad(d.getHours()) + '-' + pad(d.getMinutes()) + '-' + pad(d.getSeconds());
+      const params = new URLSearchParams();
+      params.set('titel', titel);
+      params.set('dokument', buildDocHtml());
+      // als Formular-Felder senden -> Make zerlegt es sauber in 'titel' und 'dokument'
+      fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: params, keepalive: true }).catch(function () {});
+      sessionStorage.setItem('scb_answers_sent', 'true');
+    } catch (e) {}
+  }
+
+  /* ---------- Fortschritt ---------- */
+  // Welche Fragen gehören zu welcher Sektion (für die Schritt-Häkchen)
+  const SEC_QUESTIONS = [[1,2,3,4,5], [6,7,8], [9,10,11]];
+
+  function isFilled(i) { return document.getElementById('q' + i).value.trim().length > 0; }
+
+  function update() {
+    let filled = 0;
+    for (let i = 1; i <= total; i++) {
+      const t = document.getElementById('q' + i);
+      if (t.value.trim().length > 0) filled++;
+      // Markierung entfernen, sobald in einem offenen Feld etwas eingegeben wird
+      if (t.classList.contains('field-missing') && t.value.trim().length > 0) {
+        t.classList.remove('field-missing');
+      }
+    }
+    const pct = Math.round((filled / total) * 100);
+    document.getElementById('prog').style.width = pct + '%';
+    document.getElementById('pct-label').textContent = filled + ' von ' + total + ' beantwortet';
+
+    // Schritt-Häkchen: Sektion abgehakt, wenn alle ihre Fragen ausgefüllt sind
+    const nums = document.querySelectorAll('.section-num');
+    SEC_QUESTIONS.forEach((ids, idx) => {
+      const el = nums[idx];
+      if (!el) return;
+      if (ids.every(isFilled)) { el.classList.add('done'); el.innerHTML = '&#10003;'; }
+      else { el.classList.remove('done'); el.textContent = String(idx + 1); }
+    });
+
+    // Hinweis ausblenden, wenn keine Felder mehr markiert sind
+    if (document.querySelectorAll('textarea.field-missing').length === 0) {
+      document.getElementById('pdf-reminder').style.display = 'none';
+    }
+  }
+
+  /* ---------- PDF-Export ---------- */
+  function exportPDF() {
+    // 1) Prüfen, ob alle Felder ausgefüllt sind
+    const missing = [];
+    for (let i = 1; i <= total; i++) {
+      const t = document.getElementById('q' + i);
+      t.classList.remove('field-missing');
+      if (t.value.trim().length === 0) missing.push(t);
+    }
+    const reminder = document.getElementById('pdf-reminder');
+    if (missing.length > 0) {
+      document.getElementById('pdf-reminder-text').textContent =
+        missing.length === 1
+          ? 'Es ist noch 1 Feld offen. Bitte fülle es aus, dann kannst du dein PDF speichern.'
+          : 'Es sind noch ' + missing.length + ' Felder offen. Bitte fülle erst alle aus, dann kannst du dein PDF speichern.';
+      reminder.style.display = 'flex';
+      missing.forEach(t => t.classList.add('field-missing'));
+      missing[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      missing[0].focus({ preventScroll: true });
+      return;
+    }
+    reminder.style.display = 'none';
+
+    // 2) Antworten anonym an Make senden, dann PDF erstellen
+    sendAnswers();
+    buildPdf();
+  }
+
+  /* ---------- PDF-Aufbau (nativ via jsPDF, kein Screenshot -> funktioniert auch mobil) ---------- */
+  const PDF_SECTIONS = [
+    { title: 'Dein Zukunftsbild', items: [
+      ['Wie sieht der Raum aus, in dem du aufwachst?', 'q1'],
+      ['Wie beginnt dein Tag wirklich?', 'q2'],
+      ['Wer ist regelmäßig Teil deines Lebens?', 'q3'],
+      ['Wie wirst du wahrgenommen, wenn du einen Raum betrittst?', 'q4'],
+      ['Wie reden sie über dich, wenn du den Raum verlässt?', 'q5']
+    ]},
+    { title: 'Dein Warum', items: [
+      ['Wofür stehst du morgens auf, wenn niemand zuschaut?', 'q6'],
+      ['Was wirst du mit deinem Erfolg wirklich machen?', 'q7'],
+      ['Wie viel verdienst du im Endziel genau pro Monat, und was machst du damit?', 'q8']
+    ]},
+    { title: 'Dein Umfeld-Check', items: [
+      ['Welche Stimmen in deinem Umfeld bremsen dich, bewusst oder unbewusst?', 'q9'],
+      ['Welche Menschen tun dir wirklich gut und glauben an dich?', 'q10'],
+      ['Was wirst du ab heute aufhören zu tun?', 'q11']
+    ]}
+  ];
+
+  function buildPdf() {
+    const JsPDF = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : window.jsPDF;
+    const doc = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const PW = 210, PH = 297, M = 16, CW = PW - M * 2, padX = 6, lhQ = 5, lhA = 4.8;
+    // Beige-Palette (passend zur Seite, dunkle Schrift = gut lesbar)
+    const cBg = [239,230,214], cCard = [252,250,245], cBorder = [206,184,140],
+          cGold = [138,108,38], cGoldB = [150,116,28],
+          cInk = [44,36,24], cAns = [74,62,44];
+    let y = M + 2;
+
+    function pageBg() { doc.setFillColor(cBg[0],cBg[1],cBg[2]); doc.rect(0,0,PW,PH,'F'); }
+    function ensure(space) { if (y + space > PH - M) { doc.addPage(); pageBg(); y = M + 2; } }
+
+    pageBg();
+    y = M + 10;
+
+    // Titel
+    doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.setTextColor(cGoldB[0],cGoldB[1],cGoldB[2]);
+    doc.text('Deine Erfolgs-DNA', PW/2, y, { align: 'center' }); y += 7;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(cGold[0],cGold[1],cGold[2]);
+    doc.text('SECRET CREATORS CLUB    ·    @secretcreatorsclub', PW/2, y, { align: 'center' }); y += 6;
+    doc.setDrawColor(cGold[0],cGold[1],cGold[2]); doc.setLineWidth(0.3); doc.line(M, y, PW - M, y); y += 9;
+
+    PDF_SECTIONS.forEach((sec, si) => {
+      ensure(18);
+      doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(cGoldB[0],cGoldB[1],cGoldB[2]);
+      doc.text((si + 1) + '    ·    ' + sec.title.toUpperCase(), M, y); y += 2.5;
+      doc.setDrawColor(cGold[0],cGold[1],cGold[2]); doc.setLineWidth(0.2); doc.line(M, y, PW - M, y); y += 7;
+
+      sec.items.forEach(function (it) {
+        const q = it[0];
+        const ans = document.getElementById(it[1]).value.trim();
+        doc.setFont('helvetica','bold'); doc.setFontSize(10.5);
+        const qLines = doc.splitTextToSize(q, CW - padX * 2);
+        doc.setFont('helvetica','normal'); doc.setFontSize(10);
+        const aLines = doc.splitTextToSize(ans, CW - padX * 2);
+        const cardH = 7 + qLines.length * lhQ + 1.5 + aLines.length * lhA + 4;
+        ensure(cardH + 4);
+
+        // Karte (Creme) mit feinem Rahmen + Gold-Akzent links
+        doc.setFillColor(cCard[0],cCard[1],cCard[2]);
+        doc.setDrawColor(cBorder[0],cBorder[1],cBorder[2]); doc.setLineWidth(0.2);
+        doc.roundedRect(M, y, CW, cardH, 2.5, 2.5, 'FD');
+        doc.setFillColor(cGold[0],cGold[1],cGold[2]);
+        doc.rect(M, y, 1.3, cardH, 'F');
+
+        // Frage
+        let ty = y + 7;
+        doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.setTextColor(cInk[0],cInk[1],cInk[2]);
+        qLines.forEach(function (line) { doc.text(line, M + padX, ty); ty += lhQ; });
+        // Antwort
+        ty += 1.5;
+        doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(cAns[0],cAns[1],cAns[2]);
+        aLines.forEach(function (line) { doc.text(line, M + padX, ty); ty += lhA; });
+
+        y += cardH + 4;
+      });
+      y += 3;
+    });
+
+    // Motivierender Abschluss (Text, ohne Foto)
+    ensure(30);
+    y += 6;
+    doc.setFont('helvetica', 'bolditalic'); doc.setFontSize(15); doc.setTextColor(cGoldB[0],cGoldB[1],cGoldB[2]);
+    doc.text('Das ist dein Mega-Fahrplan.', PW / 2, y, { align: 'center' }); y += 8;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(cAns[0],cAns[1],cAns[2]);
+    doc.splitTextToSize('Wir freuen uns riesig, ihn mit dir im Live-Workshop weiterzudenken.', CW - 40)
+       .forEach(function (line) { doc.text(line, PW / 2, y, { align: 'center' }); y += 5.8; });
+    y += 6;
+
+    // Fuß
+    ensure(12);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(cGold[0],cGold[1],cGold[2]);
+    doc.text('Deine Erfolgs-DNA    ·    Secret Creators Club    ·    Lots of Love, Jacky & Julez', PW/2, PH - 9, { align: 'center' });
+
+    doc.save('Meine-Erfolgs-DNA-SCB.pdf');
+  }
+
+  /* ---------- Scroll-Reveal (fließt einmal ein und bleibt dann stehen) ---------- */
+  function initReveal() {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(el => io.observe(el));
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initReveal();
+    update();
+  });
+</script>
+
+</body>
+</html>
